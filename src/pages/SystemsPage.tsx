@@ -115,7 +115,20 @@ const CategoryCard = ({ category, onClick, delay, query }: { category: SystemCat
   >
     <Tilt3D max={9} lift={6} className="group cursor-pointer relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm p-6 hover:border-primary/50 hover:shadow-[0_0_40px_hsl(var(--cyan)/0.15)] h-full" >
       <div onClick={onClick} className="absolute inset-0 z-10" aria-hidden />
-      <div className="text-4xl mb-4">{category.icon}</div>
+      <div className="relative w-16 h-16 mb-4 rounded-xl overflow-hidden border border-border/50 ring-1 ring-primary/10 shadow-[0_0_20px_hsl(var(--cyan)/0.15)]">
+        <img
+          src={getCategoryImage(category.id)}
+          alt={`${category.name} icon`}
+          loading="lazy"
+          width={128}
+          height={128}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-125"
+        />
+        <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-transparent" />
+        <span className="absolute bottom-0.5 right-1 text-base drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" aria-hidden>
+          {category.icon}
+        </span>
+      </div>
       <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
         <Highlight text={category.name} query={query} />
       </h3>
@@ -283,14 +296,14 @@ export default function SystemsPage() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="relative rounded-2xl overflow-hidden mb-8 border border-border/50 hover:border-primary/40 transition-colors aspect-[3/1] sm:aspect-[4/1]"
+                  className="group relative rounded-2xl overflow-hidden mb-8 border border-border/50 hover:border-primary/40 transition-colors aspect-[3/1] sm:aspect-[4/1]"
                 >
                   <img
                     src={getCategoryImage(selectedCategory.id)}
                     alt={`${selectedCategory.name} banner`}
                     width={1280}
                     height={720}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover animate-ken-burns will-change-transform transition-transform duration-[1500ms] ease-out group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/20" />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
