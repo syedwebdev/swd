@@ -13,6 +13,8 @@ import { AnimatedSection } from '@/components/AnimatedComponents';
 import { categories, type SystemCategory, type SystemItem } from '@/data/systemsData';
 import { Tilt3D } from '@/components/cinematic/Tilt3D';
 import { getCategoryImage } from '@/data/systemImages';
+import { SmartImage } from '@/components/SmartImage';
+import fallbackBanner from '@/assets/systems/business-saas.jpg';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -44,12 +46,13 @@ const SystemCard = ({ system, delay, onGetSystem, query, image }: { system: Syst
       className="group relative rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden hover:border-primary/40 hover:shadow-[0_0_30px_hsl(var(--cyan)/0.15)] transition-all duration-300 flex flex-col"
     >
       <div className="relative aspect-video overflow-hidden">
-        <img
+        <SmartImage
           src={image}
           alt={system.name}
           loading="lazy"
           width={640}
           height={360}
+          fallbackSrc={fallbackBanner}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
@@ -113,23 +116,39 @@ const CategoryCard = ({ category, onClick, delay, query }: { category: SystemCat
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.4, delay: delay * 0.08 }}
   >
-    <Tilt3D max={9} lift={6} className="group cursor-pointer relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm p-6 hover:border-primary/50 hover:shadow-[0_0_40px_hsl(var(--cyan)/0.15)] h-full" >
-      <div onClick={onClick} className="absolute inset-0 z-10" aria-hidden />
+    <Tilt3D
+      max={9}
+      lift={6}
+      className="group cursor-pointer relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm p-6 hover:border-primary/50 hover:shadow-[0_0_40px_hsl(var(--cyan)/0.15)] focus-within:border-primary focus-within:shadow-[0_0_40px_hsl(var(--cyan)/0.25)] focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background h-full transition-all"
+    >
+      {/* Full-card clickable layer that's keyboard-accessible */}
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={`View ${category.name} systems`}
+        className="absolute inset-0 z-10 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      />
       <div className="relative w-16 h-16 mb-4 rounded-xl overflow-hidden border border-border/50 ring-1 ring-primary/10 shadow-[0_0_20px_hsl(var(--cyan)/0.15)]">
-        <img
+        <SmartImage
           src={getCategoryImage(category.id)}
           alt={`${category.name} icon`}
           loading="lazy"
           width={128}
           height={128}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-125"
+          fallbackSrc={fallbackBanner}
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-125 group-focus-within:scale-125"
         />
-        <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-transparent" />
-        <span className="absolute bottom-0.5 right-1 text-base drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" aria-hidden>
-          {category.icon}
+        {/* Darken + tint for legibility of overlaid emoji */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background/30 via-background/10 to-background/70 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-accent/10 mix-blend-overlay pointer-events-none" />
+        {/* Frosted disc behind emoji for readability */}
+        <span className="absolute bottom-1 right-1 flex items-center justify-center w-6 h-6 rounded-full bg-background/55 backdrop-blur-md ring-1 ring-border/60 shadow-[0_2px_6px_hsl(var(--background)/0.6)] pointer-events-none" aria-hidden>
+          <span className="text-sm leading-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+            {category.icon}
+          </span>
         </span>
       </div>
-      <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+      <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary group-focus-within:text-primary transition-colors">
         <Highlight text={category.name} query={query} />
       </h3>
       <span className="inline-block text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-full mb-3">
@@ -138,7 +157,13 @@ const CategoryCard = ({ category, onClick, delay, query }: { category: SystemCat
       <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
         <Highlight text={category.description} query={query} />
       </p>
-      <Button variant="outline" size="sm" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all relative z-20" onClick={onClick}>
+      <Button
+        variant="outline"
+        size="sm"
+        tabIndex={-1}
+        aria-hidden
+        className="w-full group-hover:bg-primary group-hover:text-primary-foreground group-focus-within:bg-primary group-focus-within:text-primary-foreground transition-all pointer-events-none"
+      >
         View Systems <ChevronRight className="w-4 h-4 ml-1" />
       </Button>
     </Tilt3D>
@@ -298,12 +323,13 @@ export default function SystemsPage() {
                   transition={{ duration: 0.5 }}
                   className="group relative rounded-2xl overflow-hidden mb-8 border border-border/50 hover:border-primary/40 transition-colors aspect-[3/1] sm:aspect-[4/1]"
                 >
-                  <img
+                  <SmartImage
                     src={getCategoryImage(selectedCategory.id)}
                     alt={`${selectedCategory.name} banner`}
                     width={1280}
                     height={720}
-                    className="absolute inset-0 w-full h-full object-cover animate-ken-burns will-change-transform transition-transform duration-[1500ms] ease-out group-hover:scale-110"
+                    fallbackSrc={fallbackBanner}
+                    className="w-full h-full object-cover animate-ken-burns will-change-transform transition-transform duration-[1500ms] ease-out group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/20" />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
