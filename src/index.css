@@ -271,9 +271,117 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-ken-burns {
-    animation: none;
+  .animate-ken-burns,
+  .group:hover .animate-ken-burns {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+    scale: 1 !important;
   }
+}
+
+/* Particle drift — cinematic floating dots in hero */
+@keyframes particle-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(20px, -30px, 0) scale(1.15);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-15px, -60px, 0) scale(0.9);
+    opacity: 0;
+  }
+}
+.animate-particle-drift {
+  animation: particle-drift linear infinite;
+  will-change: transform, opacity;
+}
+
+/* CTA pulse glow ring — draws attention to primary CTAs */
+@keyframes cta-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 hsl(var(--cyan) / 0.55),
+      0 0 24px 0 hsl(var(--cyan) / 0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 0 14px hsl(var(--cyan) / 0),
+      0 0 36px 6px hsl(var(--accent) / 0.45);
+  }
+}
+.cta-pulse {
+  animation: cta-pulse 2.6s ease-in-out infinite;
+}
+
+/* Card shine sweep — subtle diagonal highlight on hover */
+.shine-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.shine-sweep::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    hsl(var(--cyan) / 0.18) 48%,
+    hsl(var(--accent) / 0.18) 52%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 5;
+}
+.group:hover .shine-sweep::before,
+.group:focus-within .shine-sweep::before {
+  transform: translateX(120%);
+}
+
+/* Shimmer — premium loading bar feel for skeletons / dividers */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer-bar {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted) / 0.3) 0%,
+    hsl(var(--cyan) / 0.4) 50%,
+    hsl(var(--muted) / 0.3) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.4s linear infinite;
+}
+
+/* Soft float — for hero badges / icons */
+@keyframes soft-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-soft-float {
+  animation: soft-float 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-particle-drift,
+  .cta-pulse,
+  .shimmer-bar,
+  .animate-soft-float {
+    animation: none !important;
+  }
+  .shine-sweep::before { display: none; }
 }
 
 

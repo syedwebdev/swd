@@ -14,6 +14,8 @@ import { categories, type SystemCategory, type SystemItem } from '@/data/systems
 import { Tilt3D } from '@/components/cinematic/Tilt3D';
 import { getCategoryImage } from '@/data/systemImages';
 import { SmartImage } from '@/components/SmartImage';
+import { AnimatedCounter } from '@/components/AnimatedCounter';
+import { ParticleField } from '@/components/cinematic/ParticleField';
 import fallbackBanner from '@/assets/systems/business-saas.jpg';
 
 const ITEMS_PER_PAGE = 20;
@@ -40,10 +42,12 @@ const SystemCard = ({ system, delay, onGetSystem, query, image }: { system: Syst
   const [expanded, setExpanded] = useState(false);
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: Math.min(delay * 0.03, 0.5) }}
-      className="group relative rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden hover:border-primary/40 hover:shadow-[0_0_30px_hsl(var(--cyan)/0.15)] transition-all duration-300 flex flex-col"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.45, delay: Math.min(delay * 0.04, 0.4), ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -4 }}
+      className="group shine-sweep relative rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden hover:border-primary/40 hover:shadow-[0_10px_40px_-10px_hsl(var(--cyan)/0.35)] transition-all duration-300 flex flex-col"
     >
       <div className="relative aspect-video overflow-hidden">
         <SmartImage
@@ -112,14 +116,15 @@ const SystemCard = ({ system, delay, onGetSystem, query, image }: { system: Syst
 
 const CategoryCard = ({ category, onClick, delay, query }: { category: SystemCategory; onClick: () => void; delay: number; query: string }) => (
   <motion.div
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.4, delay: delay * 0.08 }}
+    initial={{ opacity: 0, y: 20, scale: 0.96 }}
+    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+    viewport={{ once: true, margin: '-40px' }}
+    transition={{ duration: 0.5, delay: delay * 0.06, ease: [0.22, 1, 0.36, 1] }}
   >
     <Tilt3D
       max={9}
       lift={6}
-      className="group cursor-pointer relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm p-6 hover:border-primary/50 hover:shadow-[0_0_40px_hsl(var(--cyan)/0.15)] focus-within:border-primary focus-within:shadow-[0_0_40px_hsl(var(--cyan)/0.25)] focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background h-full transition-all"
+      className="group cursor-pointer relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-sm p-6 hover:border-primary/50 hover:shadow-[0_20px_50px_-15px_hsl(var(--cyan)/0.35)] focus-within:border-primary focus-within:shadow-[0_0_40px_hsl(var(--cyan)/0.25)] focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background h-full transition-all shine-sweep"
     >
       {/* Full-card clickable layer that's keyboard-accessible */}
       <button
@@ -218,11 +223,14 @@ export default function SystemsPage() {
       {/* Hero */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-card/30" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/5 rounded-full blur-3xl" />
+        {/* Animated gradient orbs */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1.2s' }} />
+        {/* Floating particle field */}
+        <ParticleField count={22} />
         <div className="container mx-auto px-4 relative z-10 text-center">
           <AnimatedSection>
-            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-sm border-primary/30">
+            <Badge variant="outline" className="mb-6 px-4 py-1.5 text-sm border-primary/30 animate-soft-float">
               <Sparkles className="w-4 h-4 mr-2 text-primary" />
               {totalSystems}+ Ready-to-Deploy Systems
             </Badge>
@@ -232,7 +240,29 @@ export default function SystemsPage() {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               Browse {categories.length} categories of production-ready systems. From AI tools to e-commerce — find, customize, and deploy.
             </p>
-            <Button variant="hero" size="xl" onClick={handleExplore}>
+
+            {/* Animated stat counters */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="grid grid-cols-3 max-w-xl mx-auto gap-4 mb-10"
+            >
+              {[
+                { value: categories.length, suffix: '', label: 'Categories' },
+                { value: totalSystems, suffix: '+', label: 'Systems' },
+                { value: 100, suffix: '%', label: 'Production-Ready' },
+              ].map((s) => (
+                <div key={s.label} className="rounded-xl border border-border/40 bg-card/40 backdrop-blur-sm px-3 py-4">
+                  <div className="text-2xl md:text-3xl font-extrabold gradient-text">
+                    <AnimatedCounter to={s.value} suffix={s.suffix} />
+                  </div>
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground mt-1">{s.label}</div>
+                </div>
+              ))}
+            </motion.div>
+
+            <Button variant="hero" size="xl" onClick={handleExplore} className="cta-pulse rounded-full">
               <Grid3X3 className="w-5 h-5 mr-2" />
               Explore Systems
             </Button>
